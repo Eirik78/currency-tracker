@@ -44,3 +44,8 @@ Then: Settings → Devices & services → Add integration → **Currency Tracker
 ## Attribution
 
 Rates by [Exchange Rate API](https://www.exchangerate-api.com). History: Norges Bank (NLOD 2.0).
+
+## Releasing
+
+Bump `version` in `manifest.json` and add a matching `## x.y.z` section to `CHANGELOG.md`.
+On push, a GitHub release is created and HACS offers it as an update with those notes.

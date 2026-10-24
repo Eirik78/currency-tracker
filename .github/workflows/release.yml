@@ -1,0 +1,28 @@
+name: Release
+
+# Publishes a GitHub release when manifest.json gets a new version.
+# HACS shows the tag as the version and CHANGELOG.md's section as the notes.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Create release for the manifest version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(jq -r .version custom_components/currency_tracker/manifest.json)
+          tag="v$version"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo "$tag already released"
+            exit 0
+          fi
+          awk -v v="$version" '/^## /{p = ($2 == v); next} p' CHANGELOG.md > notes.md
+          gh release create "$tag" --title "$tag" --notes-file notes.md --target "$GITHUB_SHA"
