@@ -1,0 +1,72 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add currency conversion",
+        "description": "Rates are fetched every hour between the first and last update hour. Two years of Norges Bank history is imported after setup.",
+        "data": {
+          "from_currency": "From",
+          "to_currency": "To",
+          "amount": "Amount",
+          "markup": "Markup",
+          "first_hour": "First update hour",
+          "last_hour": "Last update hour"
+        },
+        "data_description": {
+          "markup": "Percent added to the market rate."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "No rate source could be reached.",
+      "same_currency": "Choose two different currencies.",
+      "unsupported_pair": "No rate available for this currency.",
+      "last_before_first": "Last hour can't be before first hour."
+    },
+    "abort": {
+      "already_configured": "This pair is already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Conversion settings",
+        "data": {
+          "amount": "Amount",
+          "markup": "Markup",
+          "first_hour": "First update hour",
+          "last_hour": "Last update hour"
+        },
+        "data_description": {
+          "markup": "Percent added to the market rate. Changes apply from today; older days are kept."
+        }
+      }
+    },
+    "error": {
+      "last_before_first": "Last hour can't be before first hour."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "market_rate": {
+        "name": "Market rate"
+      },
+      "converted": {
+        "name": "Converted"
+      }
+    },
+    "number": {
+      "amount": {
+        "name": "Amount"
+      },
+      "markup": {
+        "name": "Markup"
+      }
+    },
+    "button": {
+      "update_now": {
+        "name": "Update now"
+      }
+    }
+  }
+}

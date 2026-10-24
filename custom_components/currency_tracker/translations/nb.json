@@ -1,0 +1,72 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Legg til valutaomregning",
+        "description": "Kursene hentes hver time mellom første og siste oppdateringstime. To års historikk fra Norges Bank importeres etter oppsettet.",
+        "data": {
+          "from_currency": "Fra",
+          "to_currency": "Til",
+          "amount": "Beløp",
+          "markup": "Påslag",
+          "first_hour": "Første oppdateringstime",
+          "last_hour": "Siste oppdateringstime"
+        },
+        "data_description": {
+          "markup": "Prosent som legges på markedskursen."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Fikk ikke kontakt med noen kurskilde.",
+      "same_currency": "Velg to forskjellige valutaer.",
+      "unsupported_pair": "Ingen kurs tilgjengelig for denne valutaen.",
+      "last_before_first": "Siste time kan ikke være før første time."
+    },
+    "abort": {
+      "already_configured": "Dette valutaparet er allerede satt opp."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Innstillinger for omregning",
+        "data": {
+          "amount": "Beløp",
+          "markup": "Påslag",
+          "first_hour": "Første oppdateringstime",
+          "last_hour": "Siste oppdateringstime"
+        },
+        "data_description": {
+          "markup": "Prosent som legges på markedskursen. Endringer gjelder fra i dag; eldre dager beholdes."
+        }
+      }
+    },
+    "error": {
+      "last_before_first": "Siste time kan ikke være før første time."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "market_rate": {
+        "name": "Markedskurs"
+      },
+      "converted": {
+        "name": "Omregnet"
+      }
+    },
+    "number": {
+      "amount": {
+        "name": "Beløp"
+      },
+      "markup": {
+        "name": "Påslag"
+      }
+    },
+    "button": {
+      "update_now": {
+        "name": "Oppdater nå"
+      }
+    }
+  }
+}
