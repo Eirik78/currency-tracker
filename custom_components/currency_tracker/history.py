@@ -20,7 +20,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import dt as dt_util
 
 from .api import async_fetch_history
-from .const import CONF_FROM, CONF_TO, DATA_HISTORY_IMPORTED, DOMAIN, HISTORY_DAYS
+from .const import CONF_FROM, CONF_TO, DATA_HISTORY_FROM, DATA_HISTORY_IMPORTED, DOMAIN
 from .coordinator import CurrencyConfigEntry, Settings
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,23 +65,58 @@ def hourly_rates(
     return out
 
 
+def _years_back(day: date, years: int) -> date:
+    try:
+        return day.replace(year=day.year - years)
+    except ValueError:  # 29 February
+        return day.replace(year=day.year - years, day=28)
+
+
+def import_range(
+    created: datetime, years: int, data: dict, tz: tzinfo
+) -> tuple[date, datetime] | None:
+    """(first day, end) still to import, or None when nothing is missing.
+
+    The recorder's own statistics start when the entry was created; after an
+    earlier import, the end is the first day already imported.
+    """
+    created = created.replace(minute=0, second=0, microsecond=0)
+    last_day = created.astimezone(tz).date()
+    first_day = _years_back(last_day, years)
+    if value := data.get(DATA_HISTORY_FROM):
+        done: date | None = date.fromisoformat(value)
+    elif data.get(DATA_HISTORY_IMPORTED):  # imported by 1.0.0
+        done = last_day - timedelta(days=730)
+    else:
+        done = None
+    if done is not None and first_day >= done:
+        return None
+    end = created if done is None else datetime.combine(done, time(), tz).astimezone(UTC)
+    return first_day, end
+
+
 async def async_import_history(hass: HomeAssistant, entry: CurrencyConfigEntry) -> None:
-    """Import two years of Norges Bank rates, up to when the entry was created."""
+    """Import Norges Bank rates back to the configured number of years.
+
+    Only days not imported before are added, so existing days keep their values.
+    """
     if "recorder" not in hass.config.components:
         return
     rate_id, conv_id = _entity_ids(hass, entry)
     if not rate_id or not conv_id:
         return
     from_cur, to_cur = entry.data[CONF_FROM], entry.data[CONF_TO]
+    settings = Settings.from_entry(entry)
+    tz = dt_util.get_default_time_zone()
 
-    # the recorder's own statistics start here
-    cutoff = entry.created_at.replace(minute=0, second=0, microsecond=0)
-    last_day = dt_util.as_local(cutoff).date()
-    first_day = last_day - timedelta(days=HISTORY_DAYS)
+    if not (todo := import_range(entry.created_at, settings.history_years, entry.data, tz)):
+        return
+    first_day, cutoff = todo
     try:
         # a week extra so a weekend at the start has a rate to carry
         daily = await async_fetch_history(
-            async_get_clientsession(hass), from_cur, to_cur, first_day - timedelta(days=7), last_day
+            async_get_clientsession(hass), from_cur, to_cur,
+            first_day - timedelta(days=7), cutoff.astimezone(tz).date(),
         )
     except (aiohttp.ClientError, TimeoutError, KeyError, ValueError) as err:
         _LOGGER.warning("Norges Bank history for %s→%s not imported, will retry at next start: %s",
@@ -89,21 +124,21 @@ async def async_import_history(hass: HomeAssistant, entry: CurrencyConfigEntry) 
         return
 
     if daily:
-        factor = Settings.from_entry(entry).factor
-        hourly = hourly_rates(daily, first_day, cutoff, dt_util.get_default_time_zone())
+        hourly = hourly_rates(daily, first_day, cutoff, tz)
         async_import_statistics(
             hass, _metadata(rate_id, to_cur), [_row(h, v) for h, v in hourly]
         )
         async_import_statistics(
-            hass, _metadata(conv_id, to_cur), [_row(h, v * factor) for h, v in hourly]
+            hass, _metadata(conv_id, to_cur), [_row(h, v * settings.factor) for h, v in hourly]
         )
-        _LOGGER.info("Imported %d hours of Norges Bank history for %s→%s",
-                     len(hourly), from_cur, to_cur)
+        _LOGGER.info("Imported Norges Bank history for %s→%s from %s", from_cur, to_cur, first_day)
     else:
         _LOGGER.info("Norges Bank publishes no rates for %s→%s; no history imported",
                      from_cur, to_cur)
 
-    hass.config_entries.async_update_entry(entry, data={**entry.data, DATA_HISTORY_IMPORTED: True})
+    hass.config_entries.async_update_entry(
+        entry, data={**entry.data, DATA_HISTORY_FROM: first_day.isoformat()}
+    )
 
 
 async def async_rewrite_today(hass: HomeAssistant, entry: CurrencyConfigEntry) -> None:

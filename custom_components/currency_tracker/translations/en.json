@@ -3,17 +3,19 @@
     "step": {
       "user": {
         "title": "Add currency conversion",
-        "description": "Rates are fetched every hour between the first and last update hour. Two years of Norges Bank history is imported after setup.",
+        "description": "Rates are fetched every hour between the first and last update hour. History from Norges Bank is imported after setup.",
         "data": {
           "from_currency": "From",
           "to_currency": "To",
           "amount": "Amount",
           "markup": "Markup",
           "first_hour": "First update hour",
-          "last_hour": "Last update hour"
+          "last_hour": "Last update hour",
+          "history_years": "History (years)"
         },
         "data_description": {
-          "markup": "Percent added to the market rate."
+          "markup": "Percent added to the market rate.",
+          "history_years": "Raising it imports the extra years from Norges Bank (up to 25)."
         }
       }
     },
@@ -35,10 +37,12 @@
           "amount": "Amount",
           "markup": "Markup",
           "first_hour": "First update hour",
-          "last_hour": "Last update hour"
+          "last_hour": "Last update hour",
+          "history_years": "History (years)"
         },
         "data_description": {
-          "markup": "Percent added to the market rate. Changes apply from today; older days are kept."
+          "markup": "Percent added to the market rate. Changes apply from today; older days are kept.",
+          "history_years": "Raising it imports the extra years from Norges Bank (up to 25)."
         }
       }
     },

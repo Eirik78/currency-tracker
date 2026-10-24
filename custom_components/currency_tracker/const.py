@@ -10,6 +10,7 @@ CONF_AMOUNT = "amount"
 CONF_MARKUP = "markup"
 CONF_FIRST_HOUR = "first_hour"
 CONF_LAST_HOUR = "last_hour"
+CONF_HISTORY_YEARS = "history_years"
 
 DEFAULT_FROM = "USD"
 DEFAULT_TO = "NOK"
@@ -17,10 +18,13 @@ DEFAULT_AMOUNT = 1.0
 DEFAULT_MARKUP = 0.0
 DEFAULT_FIRST_HOUR = 10
 DEFAULT_LAST_HOUR = 18
+DEFAULT_HISTORY_YEARS = 2
+MAX_HISTORY_YEARS = 25
 
-# set in entry.data once the Norges Bank backfill has been imported
+# entry.data: earliest day imported from Norges Bank (ISO date).
+# 1.0.0 only stored DATA_HISTORY_IMPORTED (it imported 730 days).
+DATA_HISTORY_FROM = "history_from"
 DATA_HISTORY_IMPORTED = "history_imported"
-HISTORY_DAYS = 730
 
 ATTRIBUTION = (
     "Rates by Exchange Rate API (exchangerate-api.com); "

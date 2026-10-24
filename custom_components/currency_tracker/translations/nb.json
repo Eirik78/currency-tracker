@@ -3,17 +3,19 @@
     "step": {
       "user": {
         "title": "Legg til valutaomregning",
-        "description": "Kursene hentes hver time mellom første og siste oppdateringstime. To års historikk fra Norges Bank importeres etter oppsettet.",
+        "description": "Kursene hentes hver time mellom første og siste oppdateringstime. Historikk fra Norges Bank importeres etter oppsettet.",
         "data": {
           "from_currency": "Fra",
           "to_currency": "Til",
           "amount": "Beløp",
           "markup": "Påslag",
           "first_hour": "Første oppdateringstime",
-          "last_hour": "Siste oppdateringstime"
+          "last_hour": "Siste oppdateringstime",
+          "history_years": "Historikk (år)"
         },
         "data_description": {
-          "markup": "Prosent som legges på markedskursen."
+          "markup": "Prosent som legges på markedskursen.",
+          "history_years": "Økes verdien, importeres de ekstra årene fra Norges Bank (opptil 25)."
         }
       }
     },
@@ -35,10 +37,12 @@
           "amount": "Beløp",
           "markup": "Påslag",
           "first_hour": "Første oppdateringstime",
-          "last_hour": "Siste oppdateringstime"
+          "last_hour": "Siste oppdateringstime",
+          "history_years": "Historikk (år)"
         },
         "data_description": {
-          "markup": "Prosent som legges på markedskursen. Endringer gjelder fra i dag; eldre dager beholdes."
+          "markup": "Prosent som legges på markedskursen. Endringer gjelder fra i dag; eldre dager beholdes.",
+          "history_years": "Økes verdien, importeres de ekstra årene fra Norges Bank (opptil 25)."
         }
       }
     },

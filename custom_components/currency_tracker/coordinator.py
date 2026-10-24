@@ -14,11 +14,13 @@ from .const import (
     CONF_AMOUNT,
     CONF_FIRST_HOUR,
     CONF_FROM,
+    CONF_HISTORY_YEARS,
     CONF_LAST_HOUR,
     CONF_MARKUP,
     CONF_TO,
     DEFAULT_AMOUNT,
     DEFAULT_FIRST_HOUR,
+    DEFAULT_HISTORY_YEARS,
     DEFAULT_LAST_HOUR,
     DEFAULT_MARKUP,
     DOMAIN,
@@ -37,6 +39,7 @@ class Settings:
     markup: float
     first_hour: int
     last_hour: int
+    history_years: int
 
     @classmethod
     def from_entry(cls, entry: ConfigEntry) -> Settings:
@@ -46,6 +49,7 @@ class Settings:
             float(o.get(CONF_MARKUP, DEFAULT_MARKUP)),
             int(o.get(CONF_FIRST_HOUR, DEFAULT_FIRST_HOUR)),
             int(o.get(CONF_LAST_HOUR, DEFAULT_LAST_HOUR)),
+            int(o.get(CONF_HISTORY_YEARS, DEFAULT_HISTORY_YEARS)),
         )
 
     @property

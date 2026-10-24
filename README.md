@@ -20,12 +20,17 @@ Source: [open.er-api.com](https://www.exchangerate-api.com), with
 
 ## History
 
-After setup, two years of daily rates from [Norges Bank](https://www.norges-bank.no/en/topics/Statistics/open-data/)
-are imported into long-term statistics for both sensors. Weekends carry the previous
+After setup, daily rates from [Norges Bank](https://www.norges-bank.no/en/topics/Statistics/open-data/)
+are imported into long-term statistics for both sensors: 2 years by default, up to 25
+(**History (years)** under Configure). Raising it imports only the missing older years;
+their Converted values use the current amount and markup. Weekends carry the previous
 business day's rate. Pairs without NOK are calculated through NOK; currencies Norges
 Bank doesn't publish get no history.
 
 Changing amount or markup recalculates today's statistics; older days are kept.
+
+The full history shows in a **Statistics graph** card. The History page only uses it for
+periods older than 10 days.
 
 ## Install
 

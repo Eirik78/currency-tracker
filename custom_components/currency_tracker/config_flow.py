@@ -24,6 +24,7 @@ from .const import (
     CONF_AMOUNT,
     CONF_FIRST_HOUR,
     CONF_FROM,
+    CONF_HISTORY_YEARS,
     CONF_LAST_HOUR,
     CONF_MARKUP,
     CONF_TO,
@@ -31,10 +32,12 @@ from .const import (
     DEFAULT_AMOUNT,
     DEFAULT_FIRST_HOUR,
     DEFAULT_FROM,
+    DEFAULT_HISTORY_YEARS,
     DEFAULT_LAST_HOUR,
     DEFAULT_MARKUP,
     DEFAULT_TO,
     DOMAIN,
+    MAX_HISTORY_YEARS,
 )
 
 _CURRENCY = SelectSelector(
@@ -57,6 +60,9 @@ SETTINGS_SCHEMA = vol.Schema(
         ),
         vol.Required(CONF_FIRST_HOUR, default=DEFAULT_FIRST_HOUR): _HOUR,
         vol.Required(CONF_LAST_HOUR, default=DEFAULT_LAST_HOUR): _HOUR,
+        vol.Required(CONF_HISTORY_YEARS, default=DEFAULT_HISTORY_YEARS): NumberSelector(
+            NumberSelectorConfig(min=1, max=MAX_HISTORY_YEARS, step=1, mode=NumberSelectorMode.BOX)
+        ),
     }
 )
 USER_SCHEMA = vol.Schema(
@@ -73,6 +79,7 @@ def _settings(user_input: dict[str, Any]) -> dict[str, Any]:
         CONF_MARKUP: float(user_input[CONF_MARKUP]),
         CONF_FIRST_HOUR: int(user_input[CONF_FIRST_HOUR]),
         CONF_LAST_HOUR: int(user_input[CONF_LAST_HOUR]),
+        CONF_HISTORY_YEARS: int(user_input[CONF_HISTORY_YEARS]),
     }
 
 
