@@ -20,7 +20,14 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import dt as dt_util
 
 from .api import async_fetch_history
-from .const import CONF_FROM, CONF_TO, DATA_HISTORY_FROM, DATA_HISTORY_IMPORTED, DOMAIN
+from .const import (
+    AVERAGE_DAYS,
+    CONF_FROM,
+    CONF_TO,
+    DATA_HISTORY_FROM,
+    DATA_HISTORY_IMPORTED,
+    DOMAIN,
+)
 from .coordinator import CurrencyConfigEntry, Settings
 
 _LOGGER = logging.getLogger(__name__)
@@ -164,3 +171,28 @@ async def async_rewrite_today(hass: HomeAssistant, entry: CurrencyConfigEntry) -
     ]
     if rows:
         async_import_statistics(hass, _metadata(conv_id, entry.data[CONF_TO]), rows)
+
+
+def daily_average(rows: list, since: float) -> float | None:
+    """Average of the daily means that start at or after since (timestamp)."""
+    means = [r["mean"] for r in rows if r["start"] >= since and r.get("mean") is not None]
+    return sum(means) / len(means) if means else None
+
+
+async def async_update_averages(hass: HomeAssistant, entry: CurrencyConfigEntry) -> None:
+    """Update the 30 and 365 day averages of Converted from long-term statistics."""
+    if "recorder" not in hass.config.components:
+        return
+    _, conv_id = _entity_ids(hass, entry)
+    if not conv_id:
+        return
+    now = dt_util.utcnow()
+    stats = await get_instance(hass).async_add_executor_job(
+        statistics_during_period,
+        hass, now - timedelta(days=max(AVERAGE_DAYS)), None, {conv_id}, "day", None, {"mean"},
+    )
+    rows = stats.get(conv_id, [])
+    coordinator = entry.runtime_data
+    for days in AVERAGE_DAYS:
+        coordinator.averages[days] = daily_average(rows, (now - timedelta(days=days)).timestamp())
+    coordinator.async_update_listeners()

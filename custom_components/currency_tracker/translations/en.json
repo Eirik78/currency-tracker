@@ -57,6 +57,12 @@
       },
       "converted": {
         "name": "Converted"
+      },
+      "average_30": {
+        "name": "Average 30 days"
+      },
+      "average_365": {
+        "name": "Average 365 days"
       }
     },
     "number": {

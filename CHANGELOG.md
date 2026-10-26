@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- New sensors **Average 30 days** and **Average 365 days**: the average of Converted's daily values, including imported history. Updated every hour.
+
 ## 1.1.0
 
 - New **History (years)** setting under Configure (1–25). Raising it imports the missing older years from Norges Bank; existing days are kept.

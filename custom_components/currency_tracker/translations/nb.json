@@ -57,6 +57,12 @@
       },
       "converted": {
         "name": "Omregnet"
+      },
+      "average_30": {
+        "name": "Snitt 30 dager"
+      },
+      "average_365": {
+        "name": "Snitt 365 dager"
       }
     },
     "number": {

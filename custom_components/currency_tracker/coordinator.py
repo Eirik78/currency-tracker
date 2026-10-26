@@ -77,6 +77,7 @@ class CurrencyCoordinator(DataUpdateCoordinator[RateTable]):
         self.settings = Settings.from_entry(entry)
         self._cache = cache
         self._force = False
+        self.averages: dict[int, float | None] = {}  # days -> average of Converted
 
     async def async_force_refresh(self) -> None:
         """Fetch new rates now, bypassing the shared cache."""

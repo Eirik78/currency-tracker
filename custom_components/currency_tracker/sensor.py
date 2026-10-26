@@ -8,6 +8,7 @@ from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from .const import AVERAGE_DAYS
 from .coordinator import CurrencyConfigEntry, CurrencyCoordinator
 from .entity import CurrencyEntity
 
@@ -19,7 +20,10 @@ async def async_setup_entry(
 ) -> None:
     """Add the sensors for one conversion."""
     coordinator = entry.runtime_data
-    async_add_entities([MarketRateSensor(coordinator), ConvertedSensor(coordinator)])
+    async_add_entities(
+        [MarketRateSensor(coordinator), ConvertedSensor(coordinator)]
+        + [AverageSensor(coordinator, days) for days in AVERAGE_DAYS]
+    )
 
 
 class _RateSensor(CurrencyEntity, SensorEntity):
@@ -68,3 +72,17 @@ class ConvertedSensor(_RateSensor):
             "rates_published": c.data.updated.isoformat() if c.data and c.data.updated else None,
             "source": c.data.source if c.data else None,
         }
+
+
+class AverageSensor(_RateSensor):
+    """Average of Converted's daily means, updated hourly."""
+
+    _attr_suggested_display_precision = 2
+
+    def __init__(self, coordinator: CurrencyCoordinator, days: int) -> None:
+        super().__init__(coordinator, f"average_{days}")
+        self._days = days
+
+    @property
+    def native_value(self) -> float | None:
+        return self.coordinator.averages.get(self._days)

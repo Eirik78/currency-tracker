@@ -19,6 +19,7 @@ DEFAULT_MARKUP = 0.0
 DEFAULT_FIRST_HOUR = 10
 DEFAULT_LAST_HOUR = 18
 DEFAULT_HISTORY_YEARS = 2
+AVERAGE_DAYS = (30, 365)
 MAX_HISTORY_YEARS = 25
 
 # entry.data: earliest day imported from Norges Bank (ISO date).

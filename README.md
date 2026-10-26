@@ -7,6 +7,7 @@ plus two years of history from Norges Bank.
 
 - **Converted** – amount × market rate × (1 + markup %)
 - **Market rate** – rate without markup
+- **Average 30 days**, **Average 365 days** – average of Converted's daily values, updated hourly
 - **Amount**, **Markup** – changes apply immediately, no new fetch needed
 - **Update now** – fetch rates outside the schedule
 
