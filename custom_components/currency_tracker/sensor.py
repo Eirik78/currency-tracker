@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity, SensorStateClass
+from homeassistant.components.sensor import RestoreSensor, SensorEntity, SensorStateClass
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -74,8 +74,8 @@ class ConvertedSensor(_RateSensor):
         }
 
 
-class AverageSensor(_RateSensor):
-    """Average of Converted's daily means, updated hourly."""
+class AverageSensor(_RateSensor, RestoreSensor):
+    """Average of Converted's daily means; restored on restart, updated hourly."""
 
     _attr_suggested_display_precision = 2
 
@@ -86,3 +86,10 @@ class AverageSensor(_RateSensor):
     @property
     def native_value(self) -> float | None:
         return self.coordinator.averages.get(self._days)
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        averages = self.coordinator.averages
+        if averages.get(self._days) is None and (last := await self.async_get_last_sensor_data()):
+            if isinstance(last.native_value, (int, float)):
+                averages[self._days] = float(last.native_value)

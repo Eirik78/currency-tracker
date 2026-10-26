@@ -25,31 +25,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: CurrencyConfigEntry) -> 
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
 
-    # fetch at minute 0 of every hour from first_hour to last_hour (HA's local time)
+    # every hour from first_hour to last_hour (HA's local time): rates at :00,
+    # averages at :15 (long-term statistics are saved hourly)
     s = coordinator.settings
+    hours = list(range(s.first_hour, s.last_hour + 1))
 
-    async def _scheduled(_now: datetime) -> None:
+    async def _rates(_now: datetime) -> None:
         await coordinator.async_refresh()
 
-    entry.async_on_unload(
-        async_track_time_change(
-            hass, _scheduled, hour=list(range(s.first_hour, s.last_hour + 1)), minute=0, second=0
-        )
-    )
-    async def _averages(_now: datetime | None = None) -> None:
+    async def _averages(_now: datetime) -> None:
         await history.async_update_averages(hass, entry)
 
-    # long-term statistics are saved hourly
-    entry.async_on_unload(async_track_time_change(hass, _averages, minute=15, second=0))
+    entry.async_on_unload(async_track_time_change(hass, _rates, hour=hours, minute=0, second=0))
+    entry.async_on_unload(
+        async_track_time_change(hass, _averages, hour=hours, minute=15, second=0)
+    )
     entry.async_on_unload(entry.add_update_listener(_async_entry_updated))
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    entry.async_create_background_task(hass, _averages(), f"{DOMAIN} averages")
-    # no-op once the configured years are imported
-    entry.async_create_background_task(
-        hass, history.async_import_history(hass, entry), f"{DOMAIN} history import"
-    )
+    # new conversion: import history, then calculate the averages from it.
+    # Restart: averages are restored and only calculated if they have no value.
+    entry.async_create_background_task(hass, history.async_load(hass, entry), f"{DOMAIN} load")
     return True
 
 
@@ -65,9 +62,7 @@ async def _async_entry_updated(hass: HomeAssistant, entry: CurrencyConfigEntry) 
             history.async_rewrite_today(hass, entry), f"{DOMAIN} rewrite today"
         )
     if new.history_years > old.history_years:
-        hass.async_create_background_task(
-            history.async_import_history(hass, entry), f"{DOMAIN} history import"
-        )
+        hass.async_create_background_task(history.async_load(hass, entry), f"{DOMAIN} load")
     if (old.first_hour, old.last_hour) != (new.first_hour, new.last_hour):
         hass.config_entries.async_schedule_reload(entry.entry_id)
         return

@@ -7,7 +7,7 @@ plus two years of history from Norges Bank.
 
 - **Converted** – amount × market rate × (1 + markup %)
 - **Market rate** – rate without markup
-- **Average 30 days**, **Average 365 days** – average of Converted's daily values, updated hourly
+- **Average 30 days**, **Average 365 days** – average of Converted's daily values
 - **Amount**, **Markup** – changes apply immediately, no new fetch needed
 - **Update now** – fetch rates outside the schedule
 
@@ -16,6 +16,7 @@ Add one entry per pair. Amount, markup and update hours can be changed under **C
 ## Updates
 
 At startup and every hour from 10:00 to 18:00 (adjustable, Home Assistant's time zone).
+Averages update at :15 in the same hours.
 Source: [open.er-api.com](https://www.exchangerate-api.com), with
 [currency-api](https://github.com/fawazahmed0/exchange-api) as fallback.
 
